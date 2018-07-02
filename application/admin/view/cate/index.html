@@ -1,0 +1,148 @@
+{include file="public/header,public/top" /}
+    
+    <!-- <link href="/resource/admin/tree/css/bootstrap.css" rel="stylesheet"> -->
+    <style type="text/css">
+        .jq22-header{margin-bottom: 15px;font-family: "Segoe UI", "Lucida Grande", Helvetica, Arial, "Microsoft YaHei", FreeSans, Arimo, "Droid Sans", "wenquanyi micro hei", "Hiragino Sans GB", "Hiragino Sans GB W3", "FontAwesome", sans-serif;}
+        .jq22-icon{color: #fff;}
+    </style>
+
+    <script type="text/javascript" src="/resource/admin/tree/js/bootstrap-treeview.js"></script>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"> 分类 列表 </h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <input type="input" class="form-control" id="input-select-node" placeholder="搜索...." value="">
+                </div>
+                <button type="button" class="btn btn-success" onclick="cateEdit(1)"> <i class="glyphicon glyphicon-plus"></i> 添加 </button>
+                <button type="button" class="btn btn-info" onclick="cateEdit(2)"> <i class="glyphicon glyphicon-edit"></i> 编辑 </button>
+                <button type="button" class="btn btn-danger" onclick="cateDel()">  <i class="glyphicon glyphicon-remove"></i> 删除 </button>
+
+            </div>
+            <div class="col-lg-4">
+                <div id="treeview-selectable" class=""></div>
+            </div>
+            <div class="col-lg-4">
+                <label>当前选中的分类为:</label>
+                <pre id="selectable-output" ></pre>
+                <input type="hidden" name="selectCate">
+            </div>
+        </div>
+        
+    </div>
+</div>
+<!-- /#page-wrapper -->
+<script type="text/javascript" src="/resource/admin/js/admin.js"></script>
+<script type="text/javascript">
+    // var defaultData = [
+    //   {
+    //     text: 'Parent 1',
+    //     nodes: [
+    //       {
+    //         text: 'Child 1',
+    //       },
+    //       {
+    //         text: 'Child 2',
+    //       }
+    //     ]
+    //   }
+    // ];
+    var defaultData = '{$cateStr}';
+
+    var initSelectableTree = function() {
+        return $('#treeview-selectable').treeview({
+            data: defaultData,
+            onNodeSelected: function(event, node) {
+                $('#selectable-output').prepend('<p>' + node.text + ' 选中 </p>');
+                $('input[name="selectCate"]').val(node.text);
+            },
+            onNodeUnselected: function (event, node) {
+                $('#selectable-output').prepend('<p>' + node.text + ' 取消选中 </p>');
+                $('input[name="selectCate"]').val('');
+            }
+        });
+    };
+    var $selectableTree = initSelectableTree();
+
+    var findSelectableNodes = function() {
+        return $selectableTree.treeview('search', [ $('#input-select-node').val(), { ignoreCase: false, exactMatch: false } ]);
+    };
+
+    $('#input-select-node').on('keyup', function (e) {
+        selectableNodes = findSelectableNodes();
+    });
+
+</script>
+<script type="text/javascript">
+    // 分类修改
+    function cateEdit(type){
+        loading('show');
+        var selectCate = $('input[name="selectCate"]').val();
+        var cateTitle = '添加分类';
+        if(type==2){
+            if(selectCate==''){
+                loading('hide');
+                adminAlert('未选中分类','错误');
+                return false;
+            }
+            cateTitle = '修改分类';
+        }
+
+        $.post("{:url('cate/cateEdit')}",{'selectCate':selectCate,'type':type},function(result){
+            loading('hide');
+            console.log(result);
+            adminAlert(result.data,cateTitle,1);
+        },'json');
+    }
+
+    // 保存
+    function saveChange(){
+        loading('show');
+        closeModal();
+        var parentId = $('input[name="parentId"]').val();
+        var parentName = $('input[name="parentName"]').val();
+        var cateName = $('input[name="cateName"]').val();
+        var cateId = $('input[name="id"]').val();
+
+        $.post("{:url('cate/cateSave')}",{'parentId':parentId,'parentName':parentName,'cateName':cateName,'cateId':cateId},function(res){
+            if(res.flog!=1){
+                loading('hide');
+                // alertFun(res.msg);
+                adminAlert(res.msg,'分类');
+                return false;
+            }else{
+                window.location.href = "{:url('cate/index')}";
+            }
+        },'json');
+    }
+
+    // 分类保存
+    function cateDel(){
+        loading('show');
+        var selectCate = $('input[name="selectCate"]').val();
+        var cateTitle = '分类';
+        if(selectCate==''){
+            loading('hide');
+            adminAlert('未选中分类','错误');
+            return false;
+        }
+
+        $.post("{:url('cate/cateDel')}",{'selectCate':selectCate},function(res){
+            if(res.flog!=1){
+                loading('hide');
+                adminAlert(res.msg,'分类');
+                return false;
+            }else{
+                window.location.href = "{:url('cate/index')}";
+            }
+        },'json');
+    }
+</script>
+
+{include file="public/footer" /}

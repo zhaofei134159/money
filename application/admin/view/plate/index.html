@@ -1,0 +1,206 @@
+{include file="public/header,public/top" /}
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"> 版块 列表 </h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <div class="row"> 
+        	<div class="col-lg-12">
+                <div class="panel-body">
+                    <form role="form" action="{:url('plate/index')}" method="post" id="PlateSearch">
+                    	<div class="row">
+	                    	<div class="col-lg-3">
+	                        	<input class="form-control" name="name" id="name" value="{$post['name']}" placeholder="版块名">
+	                        </div>
+	                    	<div class="col-lg-3">
+	                        	<select id="is_del" name="is_del" class="form-control">
+                                    <option value="-1" {if condition="$post['is_del']=='-1'"}selected{/if}>全部</option>
+                                    <option value="1" {if condition="$post['is_del']=='1'"}selected{/if}>删除</option>
+                                    <option value="0" {if condition="$post['is_del']=='0'"}selected{/if}>未删除</option>
+                                </select>
+	                        </div>
+	                        <span class="col-lg-2 input-group-btn">
+	                            <button class="btn btn-default" type="button" onclick="formSearch()"><i class="glyphicon glyphicon-search"></i>
+	                            </button>
+	                            <button class="btn btn-success" type="button" onclick="PlateEdit()"><i class="glyphicon glyphicon-plus"></i>
+	                            </button> 
+	                        </span>
+                    	</div>
+                    </form> 
+        		</div>
+            </div>
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>版块名</th>
+                                    <th>标示图</th>
+                                    <th>分类</th>
+                                    <th>版主</th>
+                                    <th>是否删除</th>
+                                    <th>是否审核通过</th>
+                                    <th>是否推荐到首页</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+								{foreach $plates as $plate}
+	                                <tr>
+	                                    <td>{$plate.id}</td>
+	                                    <td>{$plate.name}</td>
+	                                    <td><img src="/{$plate.headimg}" width="40" height="40"></td>
+	                                    <td>{$cates[$plate.cateid][name]}</td>
+	                                    <td>{$users[$plate.userid][nikename]}</td>
+	                                    <td>
+	                                    	{if condition="$plate.is_del==1"}
+	                                    		<span class="btn btn-outline btn-danger" onclick="isDel({$plate.id},$(this))">是</span>
+	                                    	{else}
+	                                    		<span class="btn btn-outline btn-success" onclick="isDel({$plate.id},$(this))">否</span>
+	                                    	{/if}
+	                                    </td>
+	                                    <td>
+	                                    	{if condition="$plate.is_check==2"}
+	                                    		<span class="btn btn-outline btn-danger" onclick="isCheck({$plate.id},$(this))">审核失败</span>
+	                                    	{elseif condition="$plate.is_check==1"}
+	                                    		<span class="btn btn-outline btn-success" onclick="isCheck({$plate.id},$(this))">审核成功</span>
+	                                    	{elseif condition="$plate.is_check==0"}
+	                                    		<span class="btn btn-outline btn-default" onclick="isCheck({$plate.id},$(this))">未审核</span>
+	                                    	{/if}
+	                                    </td>
+	                                    <td>
+	                                    	{if condition="$plate.is_home==1"}
+	                                    		<span class="btn btn-outline btn-success" onclick="isHome({$plate.id},$(this))">是</span>
+	                                    	{else}
+	                                    		<span class="btn btn-outline btn-danger" onclick="isHome({$plate.id},$(this))">否</span>
+	                                    	{/if}
+	                                    </td>
+	                                    <td>{$plate.ctime|date="Y-m-d H:i",###}</td>
+	                                    <td>
+	                                    	<a href="javascript:void(0);" onclick="PlateEdit({$plate.id})" class="btn btn-outline btn-info">编辑</a>
+	                                    	<a href="javascript:void(0);" onclick="PlateCart({$plate.id})" class="btn btn-outline btn-success">查看帖子</a>
+	                                    </td>
+	                                </tr>
+								{/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel -->
+                <div style="margin-bottom: 70px;text-align:right;">
+	            	{$page}
+	            </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#page-wrapper -->
+	<script type="text/javascript" src="/resource/admin/js/admin.js"></script>
+
+    <script type="text/javascript">
+    	// 搜索
+    	function formSearch(){
+	        loading('show');
+		    $('#PlateSearch').submit();
+    	}
+
+    	function PlateEdit(plateId){
+			loading('show');
+    		var url = "{:url('plate/editPlate')}";
+    		if(plateId!=undefined){
+    			url += "?plateId="+plateId;
+    		}
+    		window.location.href = url;
+    	}
+
+    	function PlateCart(plateId){
+			loading('show');
+    		var url = "{:url('Cart/index')}";
+    		if(plateId!=undefined){
+    			url += "?plateId="+plateId;
+    		}
+    		window.location.href = url;
+    	}
+
+
+		// 是否删除
+    	function isDel(id,res){
+			loading('show');
+    		$.post("{:url('Plate/isDelPlate')}",{id:id},function(data){
+	            loading('hide');
+	            if(res.hasClass('btn-danger')){
+	            	res.removeClass('btn-danger');
+	            }
+	            if(res.hasClass('btn-success')){
+	            	res.removeClass('btn-success');
+	            }
+	            if(data.msg==0){
+	            	res.addClass('btn-success');
+	            	res.html('否');
+	            }else if(data.msg==1){
+	            	res.addClass('btn-danger');
+	            	res.html('是');
+	            }
+		    },'json');
+    	}
+
+    	// 是否审核
+    	function isCheck(id,res){
+    		loading('show');
+    		$.post("{:url('Plate/isCheckPlate')}",{id:id},function(data){
+	            loading('hide');
+	            if(res.hasClass('btn-danger')){
+	            	res.removeClass('btn-danger');
+	            }
+	            if(res.hasClass('btn-success')){
+	            	res.removeClass('btn-success');
+	            }
+	            if(res.hasClass('btn-default')){
+	            	res.removeClass('btn-default');
+	            }
+
+	            if(data.msg==2){
+	            	res.addClass('btn-danger');
+	            	res.html('审核失败');
+	            }else if(data.msg==1){
+	            	res.addClass('btn-success');
+	            	res.html('审核成功');
+	            }
+		    },'json');
+
+    	}
+
+    	// 是否推荐到首页
+    	function isHome(id,res){
+			loading('show');
+    		$.post("{:url('Plate/isHomePlate')}",{id:id},function(data){
+	            loading('hide');
+	            if(res.hasClass('btn-danger')){
+	            	res.removeClass('btn-danger');
+	            }
+	            if(res.hasClass('btn-success')){
+	            	res.removeClass('btn-success');
+	            }
+	            if(data.msg==0){
+	            	res.addClass('btn-danger');
+	            	res.html('否');
+	            }else if(data.msg==1){
+	            	res.addClass('btn-success');
+	            	res.html('是');
+	            }
+		    },'json');
+    	}
+
+    </script>
+
+
+
+</div>
+
+{include file="public/footer" /}

@@ -1,0 +1,73 @@
+{include file="public/header" /}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="login-panel panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"> 管理 </h3>
+                </div>
+                <div class="panel-body">
+                    <fieldset>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="手机号" name="phone" type="phone" autofocus>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="密码" name="password" type="password" value="">
+                        </div>
+                        <!--<div class="checkbox">
+                            <label>
+                                <input name="remember" type="checkbox" value="1"> 记住我
+                            </label>
+                        </div>-->
+                        <!-- Change this to a button or input when using this as a form -->
+                        <a href="javascript:void(0);" class="btn btn-lg btn-success btn-block" onclick="do_login()">登录</a>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-offset-4">
+            <div class="alert alert-danger alert-dismissable" id="ButtonId" style="display:none;">
+                <!-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> -->
+                <p id="alertId"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/resource/admin/js/admin.js"></script>
+<script type="text/javascript">
+//登录
+function do_login(){
+    loading('show');
+    var phone = $('input[name="phone"]').val();
+    var password = $('input[name="password"]').val();
+    var remember = [];
+    $('input[name="remember"]:checked').each(function(){
+        remember.push($(this).val());    
+    });
+
+    if(phone==''){
+        loading('hide');
+        alertFun('登录手机号不能为空!');
+        return false; 
+    }
+
+    if(password==''){
+        loading('hide');
+        alertFun('密码不能为空!');
+        return false; 
+    }
+
+    $.post("{:url('login/do_login')}",{phone:phone,password:password,remember:remember},function(res){
+        if(res.flog!=1){
+            loading('hide');
+            alertFun(res.msg);
+            return false;
+        }else{
+            window.location.href = '/admin';
+        }
+    },'json');
+}
+</script>
+
+{include file="public/footer" /}

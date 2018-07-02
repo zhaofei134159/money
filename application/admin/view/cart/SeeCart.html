@@ -1,0 +1,218 @@
+{include file="public/header,public/top" /}
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"> 
+                	帖子回复 
+                    <button type="button" class="btn btn-outline btn-info" style="float:right;" onclick="back()">
+                        <i class="glyphicon glyphicon-arrow-left"></i> 返回 
+                    </button>
+                </h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+
+    	<div class="row text-left">
+    		<div class="col-lg-12">
+    			<h4>板块：{$plate[name]}</h4>
+    		</div>
+    	</div>
+    	<br>
+        <link href="/resource/text-editing/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="/resource/text-editing/css/froala_editor.min.css" rel="stylesheet" type="text/css">
+        <style>
+            section {
+                width: 100%;
+                margin: auto;
+                text-align: left;
+            }
+        </style>
+        <style type="text/css">
+            .see{width:240px;height:50px;line-height:50px;text-align:center;color:gray;opacity:0.8;margin:0 auto;background:#E5EDF2;}
+            .title{text-align:left;font-size:19px;height:50px;line-height:50px;}
+            .users{width:240px;text-align:center;background:#E5EDF2;}
+            .content{}
+            .user-mar{border-bottom:4px solid #71b6f9;}
+            .user-pad{border-bottom:2px dashed rgba(144,144,144,0.6);}
+            .headimg{width:240px;height:160px;margin:0 auto;line-height:160px;text-align:center;}
+            .userinfo{width:240px;height:100px;margin:0 auto;line-height:100px;text-align:center;}
+            .num{width:240px;height:50px;margin:0 auto;line-height:50px;text-align:center;}
+            .info{width:240px;height:50px;margin:0 auto;line-height:50px;text-align:center;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;padding:0px 30px;}
+            .SendMessage{width:240px;height:50px;margin:0 auto;line-height:50px;text-align:center;}
+        </style>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card-box">
+                    <table class="table table-bordered m-0">
+                        <tr class="user-mar">
+                            <th class="see" style="vertical-align:inherit;">
+                                查看:{$cart.see} 
+                                &nbsp; <span style="border-left:solid 1px gray;width:2px;height:20px;"></span> &nbsp;
+                                回复:{$replys|count} 
+                            </th>
+                            <th class="title" style="padding-left:30px;vertical-align:inherit;">
+                                {$cart.title}
+                            </th>
+                        </tr>
+
+                        <tr class="user-pad">
+                            <td class="users"> {$users[$cart.userid]['nikename']} </td>
+                            <td class="content" style="padding-left:30px;">
+                                发表于 {$cart.ctime|date="Y-m-d H:i:s",###}
+                                <span style="float:right;padding-right:30px;color:red;">楼主</span>
+                            </td>
+                        </tr>
+                        <tr class="user-mar">
+                            <td class="users">
+                                <div class="headimg">
+                                    {if condition="$users[$cart.userid]['headimg']"}
+                                    <img src="/{$users[$cart.userid]['headimg']}" class="thumb-xl img-thumbnail m-b-10" alt="头像">
+                                    {else}
+                                    <img src="/resource/images/user.png" class=" thumb-xl img-thumbnail m-b-10" alt="头像">
+                                    {/if}
+                                </div>
+                                <div class="userinfo">
+                                    <div class="info">
+                                        {$users[$cart.userid]['info']}
+                                    </div> 
+                                </div>
+                            </td>
+                            <td class="content" style="padding-left:30px;">
+                                {$cart.content}
+                            </td>
+                        </tr>
+
+                        {foreach $replys as $key=>$reply}
+                            <tr class="user-pad">
+                                <td class="users"> {$users[$reply.userid]['nikename']} </td>
+                                <td class="content" style="padding-left:30px;">
+                                    发表于 {$reply.ctime|date="Y-m-d H:i:s",###}
+                                    <span style="float:right;padding-right:30px;color:red;">{$reply.floor} 楼</span>
+                                </td>
+                            </tr>
+                            <tr class="user-mar">
+                                <td class="users">
+                                    <div class="headimg">
+                                        {if condition="$users[$reply.userid]['headimg']"}
+                                        <img src="/{$users[$reply.userid]['headimg']}" class="thumb-xl img-thumbnail m-b-10" alt="头像">
+                                        {else}
+                                        <img src="/resource/images/user.png" class=" thumb-xl img-thumbnail m-b-10" alt="头像">
+                                        {/if}
+                                    </div>
+                                    <div class="userinfo">
+                                        <div class="info">
+                                            {$users[$reply.userid]['info']}
+                                        </div> 
+                                    </div>
+                                </td>
+                                <td class="content" style="padding-left:30px;">
+                                    {$reply.content}
+                                </td>
+                            </tr>
+                        {/foreach}
+                        <tr class="user-mar">
+                            <td class="users"></td>
+                            <td class="content" style="text-align:right;padding-right:30px;">{$page}</td>
+                        </tr>
+                    </table>
+                    <br>
+                </div>
+            </div>
+        </div>
+	</div>
+	<script type="text/javascript" src="/resource/admin/js/admin.js"></script>
+	<script src="/resource/text-editing/js/libs/jquery-1.11.1.min.js"></script>
+	<script src="/resource/text-editing/js/froala_editor.min.js"></script>
+	<!--[if lt IE 9]>
+	<script src="/resource/text-editing/js/froala_editor_ie8.min.js"></script>
+	<![endif]-->
+	<script src="/resource/text-editing/js/plugins/tables.min.js"></script>
+	<script src="/resource/text-editing/js/plugins/lists.min.js"></script>
+	<script src="/resource/text-editing/js/plugins/colors.min.js"></script>
+	<script src="/resource/text-editing/js/plugins/media_manager.min.js"></script>
+	<script src="/resource/text-editing/js/plugins/font_family.min.js"></script>
+	<script src="/resource/text-editing/js/plugins/font_size.min.js"></script>
+	<script src="/resource/text-editing/js/plugins/block_styles.min.js"></script>
+	<script src="/resource/text-editing/js/plugins/video.min.js"></script>
+
+	<script>
+	  $(function(){
+	      $('#edit').editable({inlineMode: false, alwaysBlank: true})
+	  });
+	</script>
+	<script type="text/javascript">
+	    function doReply(){
+	        loading('show');
+	        var content = $('#edit').find('.froala-element').html();
+	        console.log(content);
+	        if(content=='<p><br></p>'){
+	            loading('hide');
+	            var $toast = toastr['error']('回复内容不能为空！');
+	            return false;
+	        }
+	        $("#content").val(content);
+	       
+	        $('#ReplyCart').submit();
+	    }
+	    function sendCart(plateId){
+	        loading('show');
+	        window.location.href = "{:url('cart/sendCart')}?plateId="+plateId;
+	    }
+	    function fanhui(plateId){
+	        loading('show');
+	        window.location.href = "{:url('cart/index')}?plateId="+plateId;
+	    }
+	    function replies(){
+	        window.location.href = window.location.pathname+'#replies';
+	    }
+	</script>
+    <!-- /#page-wrapper -->
+	<script type="text/javascript" src="/resource/admin/js/admin.js"></script>
+
+    <script type="text/javascript">
+    	// 搜索
+    	function formSearch(){
+	        loading('show');
+		    $('#PlateSearch').submit();
+    	}
+
+
+    	function SeeCart(cartId){
+			loading('show');
+    		var url = "{:url('Cart/SeeCart')}";
+    		if(cartId!=undefined){
+    			url += "?cartId="+cartId;
+    		}
+    		window.location.href = url;
+    	}
+
+
+		// 是否删除
+    	function isDel(id,res){
+			loading('show');
+    		$.post("{:url('Cart/isDelCart')}",{id:id},function(data){
+	            loading('hide');
+	            if(res.hasClass('btn-danger')){
+	            	res.removeClass('btn-danger');
+	            }
+	            if(res.hasClass('btn-success')){
+	            	res.removeClass('btn-success');
+	            }
+	            if(data.msg==0){
+	            	res.addClass('btn-success');
+	            	res.html('否');
+	            }else if(data.msg==1){
+	            	res.addClass('btn-danger');
+	            	res.html('是');
+	            }
+		    },'json');
+    	}
+
+    </script>
+
+
+
+</div>
+
+{include file="public/footer" /}

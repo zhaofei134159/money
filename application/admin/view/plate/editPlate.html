@@ -1,0 +1,238 @@
+{include file="public/header,public/top" /}
+
+    <link href="/resource/plugins/fileuploads/css/dropify.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/resource/admin/tree/js/bootstrap-treeview.js"></script>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    版块 
+                    {if condition="!empty($PlateInfo.id)"}
+                    编辑 
+                    {else}
+                    添加
+                    {/if}
+                    <button type="button" class="btn btn-outline btn-info" style="float:right;" onclick="back()">
+                        <i class="glyphicon glyphicon-arrow-left"></i> 返回 
+                    </button>
+                </h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        基本信息
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <form role="form" action="{:url('plate/savePlate')}"  method="post" id="PlateEdit" enctype="multipart/form-data">
+                                <div class="col-lg-6">
+                                    <input type="hidden" name="plateId" value="{$PlateInfo.id}">
+                                    <div class="form-group">
+                                        <label>版块名：</label>
+                                        {if condition="empty($PlateInfo.id)"}
+                                            <input class="form-control" name="name" id="name" value="{$PlateInfo.name}" placeholder="昵称" >
+                                        {else}
+                                            {$PlateInfo.name}
+                                        {/if}
+                                        <p class="help-block"></p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>版主：</label>
+                                        {if condition="empty($PlateInfo.id)"}
+                                            <select name="userid" id="userid" class="form-control">
+                                                <option value="0">请选择</option>
+                                                {foreach $userArr as $user}
+                                                <option value="{$user.id}">{$user.email}</option>
+                                                {/foreach}
+                                            </select>
+                                            <p class="help-block"></p>
+                                        {else}
+                                            {$userArr[$PlateInfo.userid]['nikename']}
+                                        {/if}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label> 
+                                            版块分类：
+                                        </label>
+                                        {if condition="empty($PlateInfo.id)"}
+                                            <select name="cateParent" id="cateParent" class="form-control" onchange="parentCate($(this))">
+                                                <option value="0">请选择</option>
+                                                {foreach $parent_cates as $cate}
+                                                <option value="{$cate.id}">{$cate.name}</option>
+                                                {/foreach}
+                                            </select>
+                                            <select name="cateid" id="cateid" class="form-control" >
+                                                <option value="0">请选择</option>
+                                            </select>
+                                            <p class="help-block"></p>
+                                        {else}
+                                            {$cates[$PlateInfo.cateid]['name']}
+                                        {/if}
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>简介：</label>
+                                        <textarea class="form-control" name="info" rows="3" cols="" style="margin: 0px -5px 0px 0px;resize:none">{$PlateInfo.info}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>版块标示图：</label>
+                                        <input type="file" class="dropify" name="headimg" data-default-file="/{$PlateInfo.headimg}" />
+                                        <p class="help-block"></p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>版块背景图：</label>
+                                        <input type="file" class="dropify" name="backimg" data-default-file="/{$PlateInfo.backimg}" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <button type="button" class="btn btn-outline btn-success" id="EditButton" onclick="EditForm($(this))">提交</button>
+                                    <button type="button" class="btn btn-outline btn-info" onclick="back()">返回</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /.row (nested) -->
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+    </div>
+
+    <script src="/resource/plugins/fileuploads/js/dropify.min.js"></script>
+    <script type="text/javascript" src="/resource/admin/js/admin.js"></script>
+ 
+    <script type="text/javascript">
+        $('.dropify').dropify({
+            messages: {
+                'default': 'Drag and drop a file here or click',
+                'replace': 'Drag and drop or click to replace',
+                'remove': 'Remove',
+                'error': 'Ooops, something wrong appended.'
+            },
+            error: {
+                'fileSize': 'The file size is too big (1M max).'
+            }
+        });
+
+        // 修改信息
+        function EditForm(res){
+            
+            loading('show');
+            var plateId = $('input[name="plateId"]').val();
+
+            if(plateId==''){
+                var name = $('input[name="name"]').val();
+                if(name==0){
+                    loading('hide');
+                    $('input[name="name"]').parent().addClass("has-error");
+                    $('input[name="name"]').next('p').html('填写版块名');
+                    return false;
+                }else{
+                    if($('input[name="name"]').parent().addClass("has-error")){
+                        $('input[name="name"]').parent().removeClass("has-error")
+                        $('input[name="name"]').next('p').html('');
+                    }
+                }
+                var userid = $("#userid option:selected").val();
+                if(userid==0){
+                    loading('hide');
+                    $('#userid').parent().addClass("has-error");
+                    $('#userid').next('p').html('选择版主');
+                    return false;
+                }else{
+                    if($('#userid').parent().addClass("has-error")){
+                        $('#userid').parent().removeClass("has-error")
+                        $('#userid').next('p').html('');
+                    }
+                }
+
+                var cateid = $("#cateid option:selected").val();
+                if(cateid==0){
+                    loading('hide');
+                    $('#cateid').parent().addClass("has-error");
+                    $('#cateid').next('p').html('选择子分类');
+                    return false;
+                }else{
+                    if($('#cateid').parent().addClass("has-error")){
+                        $('#cateid').parent().removeClass("has-error")
+                        $('#cateid').next('p').html('');
+                    }
+                }
+
+                var headimg = $('input[name="headimg"]').val();
+                console.log(headimg);
+                if(headimg==''){
+                    loading('hide');
+                    $('input[name="headimg"]').parent().addClass("has-error");
+                    $('input[name="headimg"]').next('p').html('上传版块标示图');
+                    return false;
+                }else{
+                    if($('input[name="headimg"]').parent().addClass("has-error")){
+                        $('input[name="headimg"]').parent().removeClass("has-error")
+                        $('input[name="headimg"]').next('p').html('');
+                    }
+                }
+            }
+            $('#PlateEdit').submit();
+        }
+
+        function parentCate(res){
+            var pCate = res.val();
+            if(pCate==0){
+                res.parent().addClass("has-error");
+                res.next().next('p').html('请选父分类！');
+                return false;
+            }
+
+            $.post("{:url('plate/findCate')}",{'pCate':pCate},function(data){
+                if(data.flog!=1){
+                    res.parent().addClass("has-error");
+                    res.next().next('p').html(data.msg);
+                    return false;
+                }else{
+                    var html = '<option value="0">请选择</option>';
+                    $.each(data.data,function(i,index){
+                        html += '<option value="'+index.id+'">'+index.name+'</option>';
+                    })
+                    $('#cateid').html(html);
+                    return false;
+                }
+            },'json');
+        }  
+
+        // 查看是否已经存在邮箱和昵称
+        function findUser(res,type){
+            var findField = type;
+            var findVal = res.val();
+
+            $.post("{:url('admin/findUser')}",{'findField':findField,'findVal':findVal},function(data){
+                if(data.flog!=1){
+                    res.parent().addClass("has-error");
+                    res.next('p').html(data.msg);
+                    $('#UserEditButton').addClass('disabled');
+                    return false;
+                }else{
+                    if($('#UserEditButton').hasClass('disabled')){
+                        $('#UserEditButton').removeClass('disabled');
+                    }
+                    return false;
+                }
+            },'json');
+        }
+    </script>
+
+
+
+</div>
+
+{include file="public/footer" /}

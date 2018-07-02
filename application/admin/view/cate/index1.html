@@ -1,0 +1,145 @@
+{include file="public/header,public/top" /}
+    
+
+    <!-- <link rel="stylesheet" href="/resource/admin/tree/css/demo.css" type="text/css"> -->
+    <link rel="stylesheet" href="/resource/admin/tree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+    <!-- <script type="text/javascript" src="/resource/admin/tree/js/jquery-1.4.4.min.js"></script> -->
+    <script type="text/javascript" src="/resource/admin/tree/js/jquery.ztree.core.js"></script>
+    <script type="text/javascript" src="/resource/admin/tree/js/jquery.ztree.excheck.js"></script>
+    <script type="text/javascript" src="/resource/admin/tree/js/jquery.ztree.exedit.js"></script>
+    <SCRIPT type="text/javascript">
+        var setting = {
+            view: {
+                selectedMulti: false
+            },
+            check: {
+                enable: true,
+                chkStyle: "radio",
+                radioType: "level"
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                beforeCheck: beforeCheck,
+            }
+        };
+        
+        var zNodes =[
+            { id:12, pId:1, name:"随意勾选 1-2", open:true},
+            { id:121, pId:12, name:"随意勾选 1-2-1"},
+            { id:122, pId:12, name:"随意勾选 1-2-2"},
+            { id:13, pId:1, name:"随意勾选 1-2", open:true},
+            { id:131, pId:13, name:"随意勾选 1-2-1"},
+            { id:132, pId:13, name:"随意勾选 1-2-2"},
+            { id:14, pId:1, name:"随意勾选 1-2", open:true},
+            { id:141, pId:14, name:"随意勾选 1-2-1"},
+            { id:142, pId:14, name:"随意勾选 1-2-2"},
+        ];
+
+        var code, className = "dark";
+        var log = {};
+        function beforeCheck(treeId, treeNode) {
+            console.log(treeNode);
+            var html = 'ID为:'+treeNode.id; 
+                html += '<br>';
+                html += '名称为:'+treeNode.name;
+
+            if(treeNode.pId==null){
+                treeNode.pId = 0;
+            }
+
+            if(!log.hasOwnProperty(treeNode.pId)){
+                log[treeNode.pId] = {};
+            }
+            if(!log[treeNode.pId].hasOwnProperty(treeNode.id)){
+                log[treeNode.pId][treeNode.id]=0;
+            }
+            
+            if((log[treeNode.pId][treeNode.id]%2)==0){
+                $.each(log[treeNode.pId], function(i, item){
+                    if(i!=treeNode.id&&(log[treeNode.pId][i]%2)!=0){
+                        log[treeNode.pId][i]++
+                    }
+                });
+                $('input[name="selectCateId"]').val(treeNode.id);
+                $('#log').html(html); 
+            }else{
+                $.each(log[treeNode.pId], function(i, item){
+                    if(i!=treeNode.id&&(log[treeNode.pId][i]%2)!=0){
+                        log[treeNode.pId][i]++
+                    }
+                }); 
+                $('input[name="selectCateId"]').val(0);
+                $('#log').html(''); 
+            }
+
+            log[treeNode.pId][treeNode.id]++;
+            console.log(log);
+        }     
+
+        function checkNode(e) {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+            type = e.data.type,
+            nodes = zTree.getSelectedNodes();
+            if (type.indexOf("All")<0 && nodes.length == 0) {
+                alert("请先选择一个节点");
+            }
+
+            if (type == "checkAllTrue") {
+                zTree.checkAllNodes(true);
+            } else if (type == "checkAllFalse") {
+                zTree.checkAllNodes(false);
+            } else {
+                var callbackFlag = $("#callbackTrigger").attr("checked");
+                for (var i=0, l=nodes.length; i<l; i++) {
+                    if (type == "checkTrue") {
+                        zTree.checkNode(nodes[i], true, null, callbackFlag);
+                    } else if (type == "checkFalse") {
+                        zTree.checkNode(nodes[i], false, null, callbackFlag);
+                    }else if (type == "checkTruePS") {
+                        zTree.checkNode(nodes[i], true, true, callbackFlag);
+                    } else if (type == "checkFalsePS") {
+                        zTree.checkNode(nodes[i], false, true, callbackFlag);
+                    }
+                }
+            }
+        }
+        
+        $(document).ready(function(){
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+            $("#checkTrue").bind("click", {type:"checkTrue"}, checkNode);
+            $("#checkFalse").bind("click", {type:"checkFalse"}, checkNode);
+        });
+    </SCRIPT>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"> 分类 列表 </h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <button type="button" class="btn btn-success"> <i class="glyphicon glyphicon-plus"></i> 添加 </button>
+                <button type="button" class="btn btn-info"> <i class="glyphicon glyphicon-edit"></i> 编辑 </button>
+                <button type="button" class="btn btn-danger">  <i class="glyphicon glyphicon-remove"></i> 删除 </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <ul id="treeDemo" class="ztree"></ul>
+            </div>
+            <div class="col-lg-6">
+                <label>当前选中的分类为:</label>
+                <pre id="log" ></pre>
+                <input type="hidden" name="selectCateId">
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="public/footer" /}

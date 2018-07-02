@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
+        <meta name="author" content="Coderthemes">
+
+        <!-- App Favicon -->
+        <link rel="shortcut icon" href="/resource/images/favicon.ico">
+
+        <!-- App title -->
+        <title>{:read_conf('website')['web_name']} - error</title>
+
+        <!-- App CSS -->
+        <link href="/resource/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="/resource/css/core.css" rel="stylesheet" type="text/css" />
+        <link href="/resource/css/components.css" rel="stylesheet" type="text/css" />
+        <link href="/resource/css/icons.css" rel="stylesheet" type="text/css" />
+        <link href="/resource/css/pages.css" rel="stylesheet" type="text/css" />
+        <link href="/resource/css/menu.css" rel="stylesheet" type="text/css" />
+        <link href="/resource/css/responsive.css" rel="stylesheet" type="text/css" />
+
+        <!-- HTML5 Shiv and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="/resource/js/modernizr.min.js"></script>
+
+    </head>
+    <body>
+
+        <div class="account-pages"></div>
+        <div class="clearfix"></div>
+        <div class="wrapper-page">
+            <div class="ex-page-content text-center">
+                <h3 class="text-uppercase font-600">出错了</h3>
+                <p class="text-muted">
+                    <?php echo(strip_tags($msg));?>
+                </p>
+                <br>
+                <p>
+                    页面自动 <a id="href" href="<?php echo($url);?>">跳转</a> 等待时间： <b id="wait"><?php echo($wait);?></b>
+                </p>
+            </div>
+        </div>
+        <!-- End wrapper page -->
+
+
+    	<script>
+            var resizefunc = [];
+        </script>
+
+        <!-- jQuery  -->
+        <script src="/resource/js/jquery.min.js"></script>
+        <script src="/resource/js/bootstrap.min.js"></script>
+        <script src="/resource/js/detect.js"></script>
+        <script src="/resource/js/fastclick.js"></script>
+        <script src="/resource/js/jquery.slimscroll.js"></script>
+        <script src="/resource/js/jquery.blockUI.js"></script>
+        <script src="/resource/js/waves.js"></script>
+        <script src="/resource/js/wow.min.js"></script>
+        <script src="/resource/js/jquery.nicescroll.js"></script>
+        <script src="/resource/js/jquery.scrollTo.min.js"></script>
+
+
+        <script src="/resource/js/jquery.core.js"></script>
+        <script src="/resource/js/jquery.app.js"></script>
+	
+	</body>
+</html>

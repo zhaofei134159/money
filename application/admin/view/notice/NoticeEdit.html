@@ -1,0 +1,172 @@
+{include file="public/header,public/top" /}
+
+    <link href="/resource/plugins/fileuploads/css/dropify.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/resource/admin/tree/js/bootstrap-treeview.js"></script>
+
+    <link rel="stylesheet" href="/resource/text-edit2/examples/css/style.css" />
+    <link rel="stylesheet" href="/resource/text-edit2/css/editormd.css" />
+
+    <link href="/resource/dist/summernote.css" rel="stylesheet"/>
+    <script src="/resource/dist/summernote.js"></script>
+    <script src="/resource/dist/lang/summernote-zh-CN.js"></script>    
+
+    <style>
+        .m{ width: 800px; margin-left: auto; margin-right: auto; }
+    </style>
+    <script>
+    $(function(){
+     $('.summernote').summernote({
+            height: 200,
+            tabsize: 2,
+            lang: 'zh-CN'
+        });
+    });
+    </script>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    公告 
+                    {if condition="!empty($noticeId)"}
+                    修改
+                    {else}
+                    添加
+                    {/if}
+                    <button type="button" class="btn btn-outline btn-info" style="float:right;" onclick="back()">
+                        <i class="glyphicon glyphicon-arrow-left"></i> 返回 
+                    </button>
+                </h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <form role="form" action="{:url('Notice/saveNotice')}"  method="post" id="NoticeEdit" enctype="multipart/form-data">
+                                <div class="col-lg-6">
+                                    <input type="hidden" name="noticeId" value="{$notice.id}">
+                                    <div class="form-group">
+                                        <label>公告名：</label>
+                                        <input class="form-control" name="title" id="title" value="{$notice.title}" placeholder="公告名" >
+                                        <p class="help-block"></p>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>公告标示图：</label>
+                                        <input type="file" class="dropify" name="headimg" data-default-file="/{$notice.headimg}" />
+                                        <p class="help-block"></p>
+                                    </div>
+                                </div>
+                                <div clss="col-lg-12">
+                                    <div class="form-group">
+                                        <label>内容：</label>
+                                        <div id="layout" style="background: #f6f6f6;">
+                                            <!-- <div id="test-editormd">
+                                                <textarea style="display:none;" name="content" >{$notice.content}</textarea>
+                                            </div> -->
+                                            <div class="m" id="content">     
+                                                <div class="summernote">{$notice.content}</div>
+                                            </div>
+                                            <p class="help-block"></p>
+                                        </div> 
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <button type="button" class="btn btn-outline btn-success" id="EditButton" onclick="EditForm($(this))">提交</button>
+                                    <button type="button" class="btn btn-outline btn-info" onclick="back()">返回</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /.row (nested) -->
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+    </div>
+
+    <script src="/resource/plugins/fileuploads/js/dropify.min.js"></script>
+    <script type="text/javascript" src="/resource/admin/js/admin.js"></script>
+    <!--<script src="/resource/text-edit2/examples/js/jquery.min.js"></script>-->
+    <!-- <script src="/resource/text-edit2/editormd.js"></script> -->
+    <script type="text/javascript">
+        $(function() {                
+            var testEditor = editormd("test-editormd", {
+                width: "90%",
+                height: 640,
+                markdown : "",
+                path : '/resource/text-edit2/lib/',
+                //dialogLockScreen : false,   // 设置弹出层对话框不锁屏，全局通用，默认为 true
+                //dialogShowMask : false,     // 设置弹出层对话框显示透明遮罩层，全局通用，默认为 true
+                //dialogDraggable : false,    // 设置弹出层对话框不可拖动，全局通用，默认为 true
+                //dialogMaskOpacity : 0.4,    // 设置透明遮罩层的透明度，全局通用，默认值为 0.1
+                //dialogMaskBgColor : "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为 #fff
+                imageUpload : true,
+                imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                imageUploadURL : "{:url('Notice/upload')}",
+                
+                /*
+                 上传的后台只需要返回一个 JSON 数据，结构如下：
+                 {
+                    success : 0 | 1,           // 0 表示上传失败，1 表示上传成功
+                    message : "提示的信息，上传成功或上传失败及错误信息等。",
+                    url     : "图片地址"        // 上传成功时才返回
+                 }
+                 */
+            });
+        });
+
+        $('.dropify').dropify({
+            messages: {
+                'default': 'Drag and drop a file here or click',
+                'replace': 'Drag and drop or click to replace',
+                'remove': 'Remove',
+                'error': 'Ooops, something wrong appended.'
+            },
+            error: {
+                'fileSize': 'The file size is too big (1M max).'
+            }
+        });
+
+        // 修改信息
+        function EditForm(res){
+            
+            loading('show');
+            var title = $('#title').val();
+            if(title==''){
+                loading('hide');
+                $('#title').parent().addClass("has-error");  
+                $('#title').next('p').html('标题不能为空！');
+                return false;
+            }
+
+
+            var html = $('.note-editable').html();
+            console.log(html);
+            if(html=='<p><br></p>'){
+                loading('hide');
+                $('#content').parent().addClass("has-error");  
+                $('#content').next('p').html('公告内容不能为空！').css('text-align','center');
+                return false;
+            }
+
+            $('.note-codable').html(html).attr('name','content');
+
+            $('#NoticeEdit').submit();
+        }
+
+    </script>
+
+
+
+</div>
+
+{include file="public/footer" /}
