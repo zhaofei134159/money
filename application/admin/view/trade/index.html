@@ -3,33 +3,30 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header"> 用户列表 </h1>
+                <h1 class="page-header"> 
+                {$user['name']} ( {$user['phone']} ) 交易记录 
+                <button type="button" class="btn btn-outline btn-info" style="float:right;" onclick="back()">
+                    <i class="glyphicon glyphicon-arrow-left"></i> 返回 
+                </button>
+                </h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
         <div class="row"> 
         	<div class="col-lg-12">
                 <div class="panel-body">
-                    <form role="form" action="{:url('user/index')}" method="post" id="UserSearch">
+                    <form role="form" action="{:url('trade/index')}" method="get" id="recordSearch">
                     	<div class="row">
+                    		<input type="hidden" name="uid" value="{$get['uid']}">
 	                    	<div class="col-lg-2">
-	                    		<input class="form-control" name="phone" id="phone" value="{$post['phone']}" placeholder="手机号">
+	                    		<input class="form-control" name="phone" id="phone" value="{$get['phone']}" placeholder="手机号">
 	                    	</div>
 	                    	<div class="col-lg-2">
-	                        	<input class="form-control" name="name" id="name" value="{$post['name']}" placeholder="用户名">
-	                        </div>
-	                    	<div class="col-lg-2">
-	                        	<select id="is_del" name="is_del" class="form-control">
-                                    <option value="-1" {if condition="$post['is_del']=='-1'"}selected{/if}>全部</option>
-                                    <option value="1" {if condition="$post['is_del']=='1'"}selected{/if}>删除</option>
-                                    <option value="0" {if condition="$post['is_del']=='0'"}selected{/if}>未删除</option>
-                                </select>
+	                        	<input class="form-control" name="name" id="name" value="{$get['name']}" placeholder="用户名">
 	                        </div>
 	                        <span class="col-lg-2 input-group-btn">
 	                            <button class="btn btn-default" type="button" onclick="formSearch()"><i class="glyphicon glyphicon-search"></i>
 	                            </button>
-	                            <button class="btn btn-success" type="button" onclick="UserEdit()"><i class="glyphicon glyphicon-plus"></i>
-	                            </button> 
 	                        </span>
                     	</div>
                     </form> 
@@ -42,35 +39,20 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>用户名</th>
-                                    <th>手机号</th>
-                                    <th>是否删除</th>
-                                    <th>资金</th>
+                                    <th>交易金额</th>
+                                    <th>剩余金额</th>
+                                    <th>备注</th>
                                     <th>创建时间</th>
-                                    <th>操作</th>
                                 </tr>
                             </thead>
                             <tbody>
-								{foreach $users as $ud}
+								{foreach $record as $re}
 	                                <tr>
-	                                    <td>{$ud.id}</td>
-	                                    <td>{$ud.name}</td>
-	                                    <td>{$ud.phone}</td>
-	                                    <td>
-	                                    	{if condition="$ud.is_del==1"}
-	                                    		<span class="btn btn-outline btn-danger" onclick="isDel({$ud.id},$(this))">是</span>
-	                                    	{else}
-	                                    		<span class="btn btn-outline btn-success" onclick="isDel({$ud.id},$(this))">否</span>
-	                                    	{/if}
-	                                    </td>
-	                                    <td>{$ud.money}</td>
-	                                    <td>{$ud.ctime|date="Y-m-d H:i",###}</td>
-	                                    <td>
-	                                    	<a href="javascript:void(0);" onclick="UserEdit({$ud.id})" class="btn btn-outline btn-info">编辑</a>
-	                                    	<a href="javascript:void(0);" onclick="UserTrade({$ud.id})" class="btn btn-outline btn-success">添加交易</a>
-	                                    	<a href="{:url('trade/index')}?uid={$ud.id}" class="btn btn-outline btn-default">交易记录</a>
-	                                    	<!-- <a href="javascript:void(0);" class="btn btn-outline btn-danger">删除</a> -->
-	                                    </td>
+	                                    <td>{$re.id}</td>
+	                                    <td>{$re.trade_money}</td>
+	                                    <td>{$re.surplus_money}</td>
+	                                    <td>{$re.content}</td>
+	                                    <td>{$re.ctime|date="Y-m-d H:i",###}</td>
 	                                </tr>
 								{/foreach}
                             </tbody>
@@ -94,7 +76,7 @@
 	        loading('show');
 
     	
-		    $('#UserSearch').submit();
+		    $('#recordSearch').submit();
     	}
 
     	// 用户编辑

@@ -3,6 +3,7 @@ namespace app\admin\controller;
 
 use app\admin\model\Admin;
 use app\admin\model\User as Home_user;
+use app\admin\model\TradeRecord;
 use think\Session;
 use think\Config;
 use smtp;
@@ -22,27 +23,19 @@ class User extends Common
     public function index(){
         $post = input('post.');
 
-        $email = $post['email'];
-        $nikename = $post['nikename'];
-        $sex = ($post['sex'])?$post['sex']:0;
+        $phone = $post['phone'];
+        $name = $post['name'];
         $is_del = ($post['is_del'])?$post['is_del']:'-1';
-        $is_activate = ($post['is_activate'])?$post['is_activate']:'-1';
 
     	$where = array();
-        if(!empty($email)){
-            $where['email'] = $email; 
+        if(!empty($phone)){
+            $where['phone'] = $phone; 
         }
-        if(!empty($nikename)){
-            $where['nikename'] = $nikename; 
-        }
-        if(!empty($sex)){
-            $where['sex'] = $sex;
+        if(!empty($name)){
+            $where['name'] = $name; 
         }
         if($is_del!='-1'){ 
             $where['is_del'] = $is_del; 
-        }
-        if($is_activate!='-1'){ 
-            $where['is_activate'] = $is_activate; 
         }
 
         $users = Home_user::where($where)->order('ctime','desc')->paginate(10, false);
@@ -80,10 +73,8 @@ class User extends Common
         $user = Home_user::get([$findField=>$findVal]);
         if(!empty($user)){
             $msg = '';
-            if($findField=='email'){
-                $msg = '邮箱已经存在';
-            }else if($findField=='nikename'){
-                $msg = '昵称已经存在';
+            if($findField=='phone'){
+                $msg = '手机号已经存在';
             }
             return json(['flog'=>0, 'msg'=>$msg]);
         }else{
@@ -94,33 +85,24 @@ class User extends Common
     public function saveUser(){
         $post = input('post.');
 
-        $file = request()->file('headimg');
-        if($file){
-            $info = $file->move(ROOT_PATH.'public'.DS.'uploads'.DS.'headimg');
-            if($info){
-               $post['headimg'] = 'uploads'.DS.'headimg'.DS.$info->getSaveName();
-            }else{
-                Log::log(Session::get('login_id','forum_admin').' 上传用户 '.$post['email'].' 头像错误 ：'.$file->getError());
-                $post['headimg'] = '';
-            }
-        }
-
         $post['utime'] = time();
         if(empty($post['id'])){
-            $login_stat = rand(11111, 99999);
-            $post['password'] = md5(md5($post['password']).$login_stat);
-            $post['login_stat'] = $login_stat;
-            $post['is_activate'] = 1;
             $post['ctime'] = time();
             $accountData = Home_user::create($post);
         }else{
             $id = $post['id'];
             unset($post['id']);
-            $user = Home_user::get(['id'=>$id]);
-            if(!empty($post['password'])){
-                $post['password'] = md5(md5($post['password']).$user['login_stat']);
-            }
             $accountData = Home_user::where('id', $id)->update($post); 
+        }
+        if(!empty($post['money'])){
+            $tradeRecord = array();
+            $tradeRecord['userid'] = $uid; 
+            $tradeRecord['trade_money'] = $post['money']; 
+            $tradeRecord['surplus_money'] = $post['money']; 
+            $tradeRecord['content'] = '直接修改用户资金'; 
+            $tradeRecord['ctime'] = time();
+            $tradeRecord['utime'] = time();
+            TradeRecord::create($tradeRecord);
         }
        
 
